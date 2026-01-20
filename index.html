@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>H5 摄像头/麦克风快速测试</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{margin:0;font-family:Arial;background:#111;color:#fff}
+  video{width:100%;max-width:480px;background:#000}
+  button{margin:6px;padding:8px 14px;font-size:15px}
+  .box{max-width:480px;margin:auto;text-align:center}
+</style>
+</head>
+<body>
+<div class="box">
+  <h3>摄像头 / 麦克风测试</h3>
+
+  <!-- 实时预览 -->
+  <video id="preview" autoplay playsinline muted></video>
+
+  <!-- 抓拍 -->
+  <br>
+  <button id="snapBtn">抓拍照片</button>
+  <canvas id="canvas" style="display:none"></canvas>
+  <img id="photo" style="max-width:100%;margin-top:6px;display:none">
+
+  <!-- 录制 -->
+  <br>
+  <button id="recBtn">开始录制</button>
+  <button id="stopBtn" disabled>停止录制</button>
+  <br>
+  <video id="recorded" controls style="margin-top:6px;display:none"></video>
+  <br>
+  <a id="downLink" style="display:none;color:#0f0">下载</a>
+</div>
+
+<script>
+/************ 1. 实时预览 ************/
+const preview = document.getElementById('preview');
+const constraints = { video: { facingMode: 'user' }, audio: true };
+navigator.mediaDevices.getUserMedia(constraints)
+  .then(stream => {
+    preview.srcObject = stream;
+    window.stream = stream; // 后面录制复用
+  })
+  .catch(err => alert('获取摄像头/麦克风失败：' + err));
+
+/************ 2. 抓拍 ************/
+document.getElementById('snapBtn').addEventListener('click', () => {
+  const canvas = document.getElementById('canvas');
+  const video  = preview;
+  canvas.width = video.videoWidth;
+  canvas.height= video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataURL = canvas.toDataURL('image/jpeg');
+  const photo = document.getElementById('photo');
+  photo.src = dataURL;
+  photo.style.display = 'inline-block';
+});
+
+/************ 3. 录制 ************/
+let mediaRecorder;
+let recordedBlobs = [];
+const recBtn  = document.getElementById('recBtn');
+const stopBtn = document.getElementById('stopBtn');
+const recorded = document.getElementById('recorded');
+const downLink = document.getElementById('downLink');
+
+recBtn.onclick = () => {
+  recorded.style.display = 'none';
+  downLink.style.display = 'none';
+  recordedBlobs = [];
+  const options = { mimeType: 'video/webm;codecs=vp9,opus' };
+  if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+    alert('浏览器不支持 webm/opus，将尝试默认格式');
+    options.mimeType = undefined;
+  }
+  mediaRecorder = new MediaRecorder(window.stream, options);
+  mediaRecorder.ondataavailable = e => {
+    if (e.data && e.data.size > 0) recordedBlobs.push(e.data);
+  };
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+    recorded.src = URL.createObjectURL(blob);
+    recorded.style.display = 'inline-block';
+    downLink.href = recorded.src;
+    downLink.download = 'test.webm';
+    downLink.style.display = 'inline-block';
+  };
+  mediaRecorder.start();
+  recBtn.disabled = true;
+  stopBtn.disabled = false;
+};
+
+stopBtn.onclick = () => {
+  mediaRecorder.stop();
+  recBtn.disabled = false;
+  stopBtn.disabled = true;
+};
+</script>
+</body>
+</html>
