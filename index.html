@@ -51,11 +51,10 @@ function startCamera() {
 }
 
 document.getElementById('revert').addEventListener('click', () => {
-  alert('1234')
   // 停止当前流
-  if (window.stream) {
-    window.stream.getTracks().forEach(track => track.stop());
-  }
+  // if (window.stream) {2000000000
+  //   window.stream.getTracks().forEach(track => track.stop());
+  // }
   // 切换摄像头
   front = !front;
   // 重新获取媒体流
