@@ -37,7 +37,7 @@
 <script>
 /************ 1. 实时预览 ************/
 const preview = document.getElementById('preview');
-const constraints = { video: { facingMode: 'environment' }, audio: true };
+const constraints = { video: { facingMode: { exact: "environment" } }, audio: true };
 navigator.mediaDevices.getUserMedia(constraints)
   .then(stream => {
     preview.srcObject = stream;
