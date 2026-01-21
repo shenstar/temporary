@@ -28,6 +28,7 @@
   <br>
   <button id="recBtn">开始录制</button>
   <button id="stopBtn" disabled>停止录制</button>
+  <button id="revert">镜头反转</button>
   <br>
   <video id="recorded" controls style="margin-top:6px;display:none"></video>
   <br>
@@ -37,7 +38,11 @@
 <script>
 /************ 1. 实时预览 ************/
 const preview = document.getElementById('preview');
-const constraints = { video: { facingMode: { exact: "environment" } }, audio: true };
+let front = false
+document.getElementById('revert').addEventListener('click', () => {
+  front = !front
+})
+const constraints = { video: { facingMode: front ? 'user' : 'environment' }, audio: true };
 navigator.mediaDevices.getUserMedia(constraints)
   .then(stream => {
     preview.srcObject = stream;
