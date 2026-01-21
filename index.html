@@ -34,8 +34,14 @@
   <br>
   <a id="downLink" style="display:none;color:#0f0">下载</a>
 </div>
-
+<script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
 <script>
+  // VConsole will be exported to `window.VConsole` by default.
+  var vConsole = new window.VConsole();
+</script>
+<script src="https://wwcdn.weixin.qq.com/node/open/js/wecom-jssdk-2.3.3.js"></script>
+<script>
+  console.log('-----', ww.SDK_VERSION)
 /************ 1. 实时预览 ************/
 const preview = document.getElementById('preview');
 let front = false;
@@ -115,6 +121,7 @@ stopBtn.onclick = () => {
   recBtn.disabled = false;
   stopBtn.disabled = true;
 };
+
 </script>
 </body>
 </html>
