@@ -26,8 +26,8 @@
 
   <!-- 录制 -->
   <br>
-  <button id="recBtn">开始录制1</button>
-  <button id="stopBtn" disabled>停止录制1</button>
+  <button id="recBtn">开始录制</button>
+  <button id="stopBtn" disabled>停止录制</button>
   <button id="revert">镜头反转</button>
   <br>
   <video id="recorded" controls style="margin-top:6px;display:none"></video>
@@ -51,6 +51,7 @@ function startCamera() {
 }
 
 document.getElementById('revert').addEventListener('click', () => {
+  alert('1234')
   // 停止当前流
   if (window.stream) {
     window.stream.getTracks().forEach(track => track.stop());
