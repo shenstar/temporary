@@ -42,9 +42,16 @@
 </script>
 <script src="https://wwcdn.weixin.qq.com/node/open/js/wecom-jssdk-2.3.3.js"></script>
 <script>
+async function getConfigSignature(url) {
+    // // 根据 url 生成企业签名
+    // // 生成方法参考 https://developer.work.weixin.qq.com/document/14924
+    // return { timestamp, nonceStr, signature }
+}
 ww.register({
   corpId: 'wwb67e42dea50511ad',
-  jsApiList: ['chooseImage']
+  agentId: 1000007,
+  jsApiList: ['chooseImage'],
+  // getConfigSignature
 })
 document.getElementById('qy').addEventListener('click', () => {
   console.log('chooseImage', ww.chooseImage)
