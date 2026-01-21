@@ -38,17 +38,30 @@
 <script>
 /************ 1. 实时预览 ************/
 const preview = document.getElementById('preview');
-let front = false
+let front = false;
+
+function startCamera() {
+  const constraints = { video: { facingMode: front ? 'user' : 'environment' }, audio: true };
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(stream => {
+      preview.srcObject = stream;
+      window.stream = stream; // 后面录制复用
+    })
+    .catch(err => alert('获取摄像头/麦克风失败：' + err));
+}
+
 document.getElementById('revert').addEventListener('click', () => {
-  front = !front
-})
-const constraints = { video: { facingMode: front ? 'user' : 'environment' }, audio: true };
-navigator.mediaDevices.getUserMedia(constraints)
-  .then(stream => {
-    preview.srcObject = stream;
-    window.stream = stream; // 后面录制复用
-  })
-  .catch(err => alert('获取摄像头/麦克风失败：' + err));
+  // 停止当前流
+  if (window.stream) {
+    window.stream.getTracks().forEach(track => track.stop());
+  }
+  // 切换摄像头
+  front = !front;
+  // 重新获取媒体流
+  startCamera();
+});
+
+startCamera();
 
 /************ 2. 抓拍 ************/
 document.getElementById('snapBtn').addEventListener('click', () => {
