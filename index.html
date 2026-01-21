@@ -42,6 +42,11 @@
 </script>
 <script src="https://wwcdn.weixin.qq.com/node/open/js/wecom-jssdk-2.3.3.js"></script>
 <script>
+ww.register({
+  corpId: 'wwb67e42dea50511ad',
+  jsApiList: ['chooseImage'],
+  getConfigSignature
+})
 document.getElementById('qy').addEventListener('click', () => {
   console.log('chooseImage', ww.chooseImage)
   ww.chooseImage({
