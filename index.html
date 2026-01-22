@@ -1,148 +1,22 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>H5 摄像头/麦克风快速测试</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-  body{margin:0;font-family:Arial;background:#111;color:#fff}
-  video{width:100%;max-width:480px;background:#000}
-  button{margin:6px;padding:8px 14px;font-size:15px}
-  .box{max-width:480px;margin:auto;text-align:center}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
 </head>
 <body>
-<div class="box">
-  <h3>摄像头 / 麦克风测试</h3>
-
-  <!-- 实时预览 -->
-  <video id="preview" autoplay playsinline muted></video>
-
-  <!-- 抓拍 -->
-  <br>
-  <button id="snapBtn">抓拍照片</button>
-  <canvas id="canvas" style="display:none"></canvas>
-  <img id="photo" style="max-width:100%;margin-top:6px;display:none">
-
-  <!-- 录制 -->
-  <br>
-  <button id="recBtn">开始录制</button>
-  <button id="stopBtn" disabled>停止录制</button>
-  <button id="revert">镜头反转</button>
-  <button id="qy">qy77</button>
-  <br>
-  <video id="recorded" controls style="margin-top:6px;display:none"></video>
-  <br>
-  <a id="downLink" style="display:none;color:#0f0">下载</a>
-</div>
-<script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
-<script>
-  // VConsole will be exported to `window.VConsole` by default.
-  var vConsole = new window.VConsole();
-</script>
-<script src="https://wwcdn.weixin.qq.com/node/open/js/wecom-jssdk-2.3.3.js"></script>
-<script>
-async function getConfigSignature(url) {
-    // // 根据 url 生成企业签名
-    // // 生成方法参考 https://developer.work.weixin.qq.com/document/14924
-    // return { timestamp, nonceStr, signature }
-}
-ww.register({
-  corpId: 'wwb67e42dea50511ad',
-  agentId: 1000007,
-  jsApiList: ['chooseImage'],
-  // getConfigSignature
-})
-document.getElementById('qy').addEventListener('click', () => {
-  console.log('chooseImage', ww.chooseImage)
-  ww.chooseImage({
-    count: 1,
-    sizeType: ['original', 'compressed'],
-    sourceType: ['album', 'camera'],
-    defaultCameraMode: 'batch',
-    isSaveToAlbum: true
-  })
-})
-/************ 1. 实时预览 ************/
-const preview = document.getElementById('preview');
-let front = false;
-
-function startCamera() {
-  const constraints = { video: { facingMode: front ? 'user' : 'environment' }, audio: true };
-  navigator.mediaDevices.getUserMedia(constraints)
-    .then(stream => {
-      preview.srcObject = stream;
-      window.stream = stream; // 后面录制复用
+  <input type="file" id="takePhoto" accept="image/*" capture="camera" />
+  <div>12345</div>
+  <script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
+  <script>
+    // VConsole will be exported to `window.VConsole` by default.
+    var vConsole = new window.VConsole();
+  </script>
+  <script>
+    document.querySelector('#takePhoto').addEventListener('click', function(e) {
+      console.log(e)
     })
-    .catch(err => alert('获取摄像头/麦克风失败：' + err));
-}
-
-document.getElementById('revert').addEventListener('click', () => {
-  // 停止当前流
-  // if (window.stream) {2000000000
-  //   window.stream.getTracks().forEach(track => track.stop());
-  // }
-  // 切换摄像头
-  front = !front;
-  // 重新获取媒体流
-  startCamera();
-});
-
-startCamera();
-
-/************ 2. 抓拍 ************/
-document.getElementById('snapBtn').addEventListener('click', () => {
-  const canvas = document.getElementById('canvas');
-  const video  = preview;
-  canvas.width = video.videoWidth;
-  canvas.height= video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  const dataURL = canvas.toDataURL('image/jpeg');
-  const photo = document.getElementById('photo');
-  photo.src = dataURL;
-  photo.style.display = 'inline-block';
-});
-
-/************ 3. 录制 ************/
-let mediaRecorder;
-let recordedBlobs = [];
-const recBtn  = document.getElementById('recBtn');
-const stopBtn = document.getElementById('stopBtn');
-const recorded = document.getElementById('recorded');
-const downLink = document.getElementById('downLink');
-
-recBtn.onclick = () => {
-  recorded.style.display = 'none';
-  downLink.style.display = 'none';
-  recordedBlobs = [];
-  const options = { mimeType: 'video/webm;codecs=vp9,opus' };
-  if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-    alert('浏览器不支持 webm/opus，将尝试默认格式');
-    options.mimeType = undefined;
-  }
-  mediaRecorder = new MediaRecorder(window.stream, options);
-  mediaRecorder.ondataavailable = e => {
-    if (e.data && e.data.size > 0) recordedBlobs.push(e.data);
-  };
-  mediaRecorder.onstop = () => {
-    const blob = new Blob(recordedBlobs, { type: 'video/webm' });
-    recorded.src = URL.createObjectURL(blob);
-    recorded.style.display = 'inline-block';
-    downLink.href = recorded.src;
-    downLink.download = 'test.webm';
-    downLink.style.display = 'inline-block';
-  };
-  mediaRecorder.start();
-  recBtn.disabled = true;
-  stopBtn.disabled = false;
-};
-
-stopBtn.onclick = () => {
-  mediaRecorder.stop();
-  recBtn.disabled = false;
-  stopBtn.disabled = true;
-};
-
-</script>
+  </script>
 </body>
 </html>
